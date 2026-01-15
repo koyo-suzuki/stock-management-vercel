@@ -70,6 +70,13 @@ StockYard Manager でGoogleログインを使用するための設定方法で�
 # Google OAuth
 GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET="GOCSPX-your-client-secret"
+
+# Allowed email addresses (comma-separated)
+# 特定のメールアドレスのみログインを許可
+ALLOWED_EMAILS="your-email@gmail.com,another-email@example.com"
+
+# または、ドメイン全体を許可（例: @company.com）
+# ALLOWED_EMAILS="@company.com"
 ```
 
 ### Vercel 本番環境
@@ -79,6 +86,7 @@ GOOGLE_CLIENT_SECRET="GOCSPX-your-client-secret"
 3. 以下の環境変数を追加:
    - Key: `GOOGLE_CLIENT_ID`、Value: コピーしたクライアントID
    - Key: `GOOGLE_CLIENT_SECRET`、Value: コピーしたクライアントシークレット
+   - Key: `ALLOWED_EMAILS`、Value: `your-email@gmail.com,other-email@example.com`
 4. **Save**
 
 ⚠️ **重要**: 環境変数を追加したら、Vercelで再デプロイが必要です。
@@ -141,6 +149,54 @@ GOOGLE_CLIENT_SECRET="GOCSPX-your-client-secret"
    ```
 2. Google Cloud Console のリダイレクトURIも更新:
    - `http://localhost:3000/api/auth/callback/google`
+
+### "Access Denied" エラーが表示される
+
+**原因**: ログインしようとしたメールアドレスが `ALLOWED_EMAILS` に含まれていません。
+
+**解決策**:
+1. `.env` ファイル（ローカル）または Vercel の環境変数で `ALLOWED_EMAILS` を確認
+2. ログインしたいメールアドレスを追加:
+   ```env
+   ALLOWED_EMAILS="user1@gmail.com,user2@example.com"
+   ```
+3. ローカルの場合は開発サーバーを再起動
+4. Vercel の場合は再デプロイ
+
+## 🔒 アクセス制限の設定
+
+このアプリは、特定のGoogleアカウントのみがログインできるように制限されています。
+
+### 特定のメールアドレスを許可
+
+複数のメールアドレスをカンマ区切りで指定:
+
+```env
+ALLOWED_EMAILS="admin@company.com,user@company.com,manager@company.com"
+```
+
+### ドメイン全体を許可
+
+会社のドメイン全体を許可する場合（例: @company.com）:
+
+```env
+ALLOWED_EMAILS="@company.com"
+```
+
+これにより、`anyone@company.com` でログインできるようになります。
+
+### 混在設定
+
+特定のメールアドレスとドメインを組み合わせることも可能:
+
+```env
+ALLOWED_EMAILS="admin@gmail.com,@company.com"
+```
+
+### 許可リストの変更
+
+1. **ローカル開発**: `.env` ファイルを編集して、開発サーバーを再起動
+2. **Vercel本番**: Settings → Environment Variables → `ALLOWED_EMAILS` を編集 → 再デプロイ
 
 ## 📚 参考リンク
 
