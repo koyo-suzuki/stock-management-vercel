@@ -40,7 +40,7 @@ INSERT INTO "User" ("id", "username", "password")
 VALUES (
     'cldefault00001',
     'admin',
-    '$2b$10$K7L/vJH4Q8ZqX9Z9O.rJ5yPxQXvXvXvXvXvXvXvXvXvXvXvXvXvXu'
+    '$2b$10$/13BN05c7RGJkc1qYfC5.egYniqEB/zEVzd.DuwmzOGlr34wsuU/K'
 )
 ON CONFLICT ("username") DO NOTHING;
 
