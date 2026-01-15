@@ -21,6 +21,7 @@ async function getUser(username: string) {
 
 export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  trustHost: true, // Required for production deployment (Vercel, etc.)
   providers: [
     Credentials({
       async authorize(credentials) {

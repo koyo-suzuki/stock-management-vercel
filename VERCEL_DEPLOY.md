@@ -56,13 +56,11 @@ StockYard Manager を Vercel にデプロイする手順を説明します。
    your-random-secret-key-here-32-characters-long
    ```
 
-2. **NEXTAUTH_URL**
+2. **NEXTAUTH_URL** (オプション)
    - Key: `NEXTAUTH_URL`
    - Value: `https://your-project-name.vercel.app`
 
-   ⚠️ **注意**: 最初は仮のURLを入れておき、デプロイ後に実際のURLに更新します
-
-   または、この環境変数は**後で追加**でもOK（Vercelが自動設定）
+   ⚠️ **注意**: NextAuth v5 では `trustHost: true` が設定されているため、この環境変数は省略可能です。設定する場合は、デプロイ後に実際のURLに更新してください。
 
 **重要**: データベース接続情報（POSTGRES_*）は、次のステップでデータベースを作成した後に自動追加されます。
 
