@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+// ユーザー管理
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String // Hashed password (bcrypt)
+}
+
+// 商品親データ(共通情報)
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String?  // 画像がない場合はフロント側でダミー画像を表示
+  variants  ProductVariant[] // Relation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 商品子データ(バリエーション・在庫情報)
+model ProductVariant {
+  id          String  @id @default(cuid())
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  color       String  // e.g. "Red", "Blue", "Free"
+  stockTokyo  Int     @default(0)
+  stockOsaka  Int     @default(0)
+  minStock    Int     @default(0) // この値を下回るとアラート表示
+
+  @@unique([productId, color]) // 同一商品内で同じ色は重複不可
+}

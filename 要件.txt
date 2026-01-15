@@ -1,0 +1,125 @@
+# StockYard Manager (v3.1) - Technical Requirement Document
+
+## 1. プロジェクト概要
+
+**StockYard Manager** は、複数拠点（東京・大阪）の在庫をリアルタイム管理するWebアプリケーションです。
+今回は「モダンWeb開発の学習」を目的とし、Next.js (App Router) と Vercel エコシステムをフル活用した構成で開発します。特に「カラーバリエーション（SKU）管理」と「ネイティブアプリのような即時保存（Optimistic UI）」を重視します。
+
+## 2. 技術スタック (Tech Stack)
+
+以下のスタックを厳守して実装すること。
+
+* **Framework**: Next.js 14+ (App Router)
+* **Language**: TypeScript
+* **Styling**: Tailwind CSS
+* **Database**: Vercel Postgres (PostgreSQL)
+* **ORM**: Prisma
+* **Auth**: NextAuth.js (v5 preferred) - Credentials Provider
+* **Icons**: Lucide React
+* **Validation**: Zod (schema validation)
+* **UI Feedback**: React Hot Toast (or Sonner)
+* **Deployment**: Vercel
+
+## 3. データモデル (Prisma Schema)
+
+**1対多 (One-to-Many)** のリレーションを用い、商品（親）とカラーバリエーション（子）を管理する。
+
+```prisma
+// ユーザー管理
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String // Hashed password (bcrypt)
+}
+
+// 商品親データ（共通情報）
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String?  // 画像がない場合はフロント側でダミー画像を表示
+  variants  ProductVariant[] // Relation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 商品子データ（バリエーション・在庫情報）
+model ProductVariant {
+  id          String  @id @default(cuid())
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  color       String  // e.g. "Red", "Blue", "Free"
+  stockTokyo  Int     @default(0)
+  stockOsaka  Int     @default(0)
+  minStock    Int     @default(0) // この値を下回るとアラート表示
+  
+  @@unique([productId, color]) // 同一商品内で同じ色は重複不可
+}
+
+```
+
+## 4. 機能要件詳細
+
+### 4.1. 認証 (Authentication)
+
+* **ログイン**: ユーザー名とパスワードによる認証。
+* **セキュリティ**: パスワードはハッシュ化して保存・照合する。
+* **保護**: ミドルウェアで未認証ユーザーをログインページへリダイレクト。
+
+### 4.2. 在庫ダッシュボード (Dashboard)
+
+* **表示レイアウト**:
+* 商品（親）ごとにカードまたはテーブル行を作成。
+* その中にバリエーション（色）ごとの在庫行をネストして表示する。
+* *例: 「Tシャツ」の下に「赤」「青」の行がぶら下がる形。*
+
+
+* **フィルタリング**:
+* テキスト検索（商品名）。
+* 拠点タブ切り替え（All / Tokyo / Osaka）。
+
+
+* **在庫編集 & 自動保存 (Core Feature)**:
+* **操作**: 数値入力 (`input type="number"`) を直接変更する。保存ボタンは設置しない。
+* **Auto-Save**: `onBlur` (フォーカスが外れた時) イベントで Server Action を発火し、DBを更新する。
+* **Optimistic UI**: 通信の完了を待たず、入力した瞬間に画面の数字を確定させる（UX向上）。通信エラー時のみ値を元に戻し、トーストでエラー通知を行う。
+
+
+* **アラート**:
+* バリエーションごとに `(stockTokyo + stockOsaka) < minStock` の場合、その行を赤色やアイコンで強調表示する。
+
+
+
+### 4.3. 商品管理 (CRUD)
+
+* **新規登録 (Nested Create)**:
+* モーダルまたは別ページで実装。
+* 商品名、画像URLを入力。
+* 「バリエーションを追加」ボタンで、必要な色数だけ入力欄（色名、初期在庫、閾値）を動的に増やす。
+* 保存時、親(`Product`)と子(`ProductVariant`)を一度のトランザクションで作成する。
+
+
+* **削除**:
+* 商品を削除すると、紐づくバリエーションも全て削除される（Cascade Delete）。
+
+
+
+### 4.4. ユーティリティ
+
+* **CSVエクスポート**:
+* 現在の在庫状況（親商品名、色、各在庫数）をフラットなCSVにしてダウンロードするServer Actionを実装。
+
+
+* **画像フォールバック**:
+* 画像URLが無効または空の場合、`public/no-image.png` 等を表示してレイアウト崩れを防ぐ。
+
+
+
+## 5. 開発の指針 (Guidelines for AI)
+
+1. **Server Actions First**: API Routes (`pages/api`) は使用せず、データ取得・更新はすべて **Server Components** と **Server Actions** で完結させること。
+2. **Loading States**: データ取得中は `Suspense` とスケルトンスクリーン (`Skeleton`) を使用し、ユーザーを待たせないUIにすること。
+3. **Component Architecture**:
+* `ProductList` (Server Component)
+* `ProductRow` (Client Component - 編集機能を持つため)
+* `VariantRow` (Client Component - 入力制御)
+のように、適切にServer/Clientコンポーネントを分離すること。
