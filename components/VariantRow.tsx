@@ -48,7 +48,7 @@ export default function VariantRow({
       } else {
         setOsakaStock(variant.stockOsaka);
       }
-      toast.error('Failed to update stock');
+      toast.error('在庫の更新に失敗しました');
     }
   };
 
@@ -73,7 +73,7 @@ export default function VariantRow({
             value={tokyoStock}
             onChange={(e) => setTokyoStock(parseInt(e.target.value) || 0)}
             onBlur={(e) => handleStockUpdate('stockTokyo', parseInt(e.target.value) || 0)}
-            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
             disabled={isSaving}
           />
         </td>
@@ -87,7 +87,7 @@ export default function VariantRow({
             value={osakaStock}
             onChange={(e) => setOsakaStock(parseInt(e.target.value) || 0)}
             onBlur={(e) => handleStockUpdate('stockOsaka', parseInt(e.target.value) || 0)}
-            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
             disabled={isSaving}
           />
         </td>
@@ -105,12 +105,12 @@ export default function VariantRow({
         {isLowStock ? (
           <div className="flex items-center gap-2 text-red-600">
             <AlertTriangle size={18} />
-            <span className="text-sm font-semibold">Low Stock</span>
+            <span className="text-sm font-semibold">在庫少</span>
           </div>
         ) : (
           <div className="flex items-center gap-2 text-green-600">
             <CheckCircle size={18} />
-            <span className="text-sm">Good</span>
+            <span className="text-sm">良好</span>
           </div>
         )}
       </td>

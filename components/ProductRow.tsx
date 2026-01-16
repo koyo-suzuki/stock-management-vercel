@@ -23,7 +23,7 @@ export default function ProductRow({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete "${product.name}" and all its variants?`)) {
+    if (!confirm(`「${product.name}」とすべてのバリエーションを削除してもよろしいですか？`)) {
       return;
     }
 
@@ -31,9 +31,9 @@ export default function ProductRow({
     const result = await deleteProduct(product.id);
 
     if (result.success) {
-      toast.success('Product deleted successfully');
+      toast.success('商品を削除しました');
     } else {
-      toast.error('Failed to delete product');
+      toast.error('商品の削除に失敗しました');
       setIsDeleting(false);
     }
   };
@@ -65,7 +65,7 @@ export default function ProductRow({
 
           <div>
             <h3 className="font-semibold text-lg text-gray-900">{product.name}</h3>
-            <p className="text-sm text-gray-500">{product.variants.length} variant(s)</p>
+            <p className="text-sm text-gray-500">{product.variants.length} バリエーション</p>
           </div>
         </div>
 

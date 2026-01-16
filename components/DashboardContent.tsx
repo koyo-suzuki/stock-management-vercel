@@ -77,8 +77,8 @@ export default function DashboardContent({
               type="text"
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              placeholder="商品を検索..."
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
             />
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function DashboardContent({
             className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             <Download size={20} />
-            <span className="hidden sm:inline">Export CSV</span>
+            <span className="hidden sm:inline">CSV出力</span>
           </button>
 
           <button
@@ -98,7 +98,7 @@ export default function DashboardContent({
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-1 md:flex-initial justify-center"
           >
             <Plus size={20} />
-            Add Product
+            商品を追加
           </button>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default function DashboardContent({
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          All Locations
+          全ロケーション
         </button>
         <button
           onClick={() => handleLocationChange('tokyo')}
@@ -124,7 +124,7 @@ export default function DashboardContent({
           }`}
         >
           <MapPin size={18} />
-          Tokyo
+          東京
         </button>
         <button
           onClick={() => handleLocationChange('osaka')}
@@ -135,7 +135,7 @@ export default function DashboardContent({
           }`}
         >
           <MapPin size={18} />
-          Osaka
+          大阪
         </button>
       </div>
 

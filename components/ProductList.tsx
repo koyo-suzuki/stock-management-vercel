@@ -60,9 +60,9 @@ export default function ProductList({
     return (
       <div className="bg-white rounded-lg shadow p-12 text-center">
         <Package className="mx-auto text-gray-400 mb-4" size={64} />
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">No products found</h3>
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">商品が見つかりません</h3>
         <p className="text-gray-500">
-          {searchQuery ? 'Try adjusting your search query' : 'Add your first product to get started'}
+          {searchQuery ? '検索条件を変更してみてください' : '最初の商品を追加して始めましょう'}
         </p>
       </div>
     );

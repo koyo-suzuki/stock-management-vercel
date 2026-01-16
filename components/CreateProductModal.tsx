@@ -48,12 +48,12 @@ export default function CreateProductModal({
     e.preventDefault();
 
     if (!productName.trim()) {
-      toast.error('Product name is required');
+      toast.error('商品名を入力してください');
       return;
     }
 
     if (variants.some(v => !v.color.trim())) {
-      toast.error('All variants must have a color');
+      toast.error('すべてのバリエーションにカラーを入力してください');
       return;
     }
 
@@ -68,14 +68,14 @@ export default function CreateProductModal({
     setIsSubmitting(false);
 
     if (result.success) {
-      toast.success('Product created successfully');
+      toast.success('商品を作成しました');
       // Reset form
       setProductName('');
       setImageUrl('');
       setVariants([{ color: '', stockTokyo: 0, stockOsaka: 0, minStock: 0 }]);
       onClose();
     } else {
-      toast.error(result.error || 'Failed to create product');
+      toast.error(result.error || '商品の作成に失敗しました');
     }
   };
 
@@ -84,7 +84,7 @@ export default function CreateProductModal({
       <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b flex items-center justify-between bg-gray-50">
-          <h2 className="text-2xl font-bold text-gray-900">Create New Product</h2>
+          <h2 className="text-2xl font-bold text-gray-900">新規商品作成</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-200 rounded-full transition-colors"
@@ -98,31 +98,31 @@ export default function CreateProductModal({
           <div className="space-y-6">
             {/* Product Info */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-gray-900">Product Information</h3>
+              <h3 className="font-semibold text-lg text-gray-900">商品情報</h3>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Name *
+                  商品名 *
                 </label>
                 <input
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  placeholder="e.g. Cotton T-Shirt"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
+                  placeholder="例: コットンTシャツ"
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image URL (optional)
+                  画像URL（任意）
                 </label>
                 <input
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
@@ -131,14 +131,14 @@ export default function CreateProductModal({
             {/* Variants */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-lg text-gray-900">Color Variants</h3>
+                <h3 className="font-semibold text-lg text-gray-900">カラーバリエーション</h3>
                 <button
                   type="button"
                   onClick={addVariant}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Plus size={18} />
-                  Add Variant
+                  バリエーション追加
                 </button>
               </div>
 
@@ -149,54 +149,54 @@ export default function CreateProductModal({
                       <div className="flex-1 grid grid-cols-1 md:grid-cols-5 gap-3">
                         <div className="md:col-span-1">
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Color *
+                            カラー *
                           </label>
                           <input
                             type="text"
                             value={variant.color}
                             onChange={(e) => updateVariant(index, 'color', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-                            placeholder="Red"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
+                            placeholder="赤"
                             required
                           />
                         </div>
 
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Tokyo Stock
+                            東京在庫
                           </label>
                           <input
                             type="number"
                             min="0"
                             value={variant.stockTokyo}
                             onChange={(e) => updateVariant(index, 'stockTokyo', parseInt(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
                           />
                         </div>
 
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Osaka Stock
+                            大阪在庫
                           </label>
                           <input
                             type="number"
                             min="0"
                             value={variant.stockOsaka}
                             onChange={(e) => updateVariant(index, 'stockOsaka', parseInt(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
                           />
                         </div>
 
                         <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Min Stock
+                            最小在庫
                           </label>
                           <input
                             type="number"
                             min="0"
                             value={variant.minStock}
                             onChange={(e) => updateVariant(index, 'minStock', parseInt(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
                           />
                         </div>
                       </div>
@@ -225,14 +225,14 @@ export default function CreateProductModal({
             onClick={onClose}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            Cancel
+            キャンセル
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
-            {isSubmitting ? 'Creating...' : 'Create Product'}
+            {isSubmitting ? '作成中...' : '商品を作成'}
           </button>
         </div>
       </div>
