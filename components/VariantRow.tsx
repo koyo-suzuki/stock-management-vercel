@@ -5,14 +5,18 @@ import { useState } from 'react';
 import { updateStock } from '@/lib/actions';
 import toast from 'react-hot-toast';
 import { Check, X } from 'lucide-react';
+import { UserRole } from '@/lib/auth';
 
 export default function VariantRow({
   variant,
-  locationFilter
+  locationFilter,
+  userRole = 'guest',
 }: {
   variant: ProductVariant;
   locationFilter?: string;
+  userRole?: UserRole;
 }) {
+  const isAdmin = userRole === 'admin';
   // Optimistic UI state
   const [tokyoStock, setTokyoStock] = useState(variant.stockTokyo);
   const [osakaStock, setOsakaStock] = useState(variant.stockOsaka);
@@ -76,9 +80,9 @@ export default function VariantRow({
           <div className="relative">
             <select
               value={pendingTokyoStock !== null ? pendingTokyoStock : tokyoStock}
-              onChange={(e) => setPendingTokyoStock(parseInt(e.target.value))}
-              className="w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer text-sm"
-              disabled={isSaving}
+              onChange={(e) => isAdmin && setPendingTokyoStock(parseInt(e.target.value))}
+              className={`w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white text-sm ${isAdmin ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+              disabled={isSaving || !isAdmin}
             >
               {Array.from({ length: 101 }, (_, i) => i).map((num) => (
                 <option key={num} value={num}>
@@ -121,9 +125,9 @@ export default function VariantRow({
           <div className="relative">
             <select
               value={pendingOsakaStock !== null ? pendingOsakaStock : osakaStock}
-              onChange={(e) => setPendingOsakaStock(parseInt(e.target.value))}
-              className="w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer text-sm"
-              disabled={isSaving}
+              onChange={(e) => isAdmin && setPendingOsakaStock(parseInt(e.target.value))}
+              className={`w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white text-sm ${isAdmin ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+              disabled={isSaving || !isAdmin}
             >
               {Array.from({ length: 101 }, (_, i) => i).map((num) => (
                 <option key={num} value={num}>

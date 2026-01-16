@@ -8,14 +8,18 @@ import StockHistoryModal from './StockHistoryModal';
 import ProductList from './ProductList';
 import { exportToCSV } from '@/lib/actions';
 import toast from 'react-hot-toast';
+import { UserRole } from '@/lib/auth';
 
 export default function DashboardContent({
   searchQuery,
   locationFilter,
+  userRole = 'guest',
 }: {
   searchQuery?: string;
   locationFilter?: string;
+  userRole?: UserRole;
 }) {
+  const isAdmin = userRole === 'admin';
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,31 +100,35 @@ export default function DashboardContent({
             <span className="hidden sm:inline">更新</span>
           </button>
 
-          <button
-            onClick={() => setIsHistoryModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            title="変更履歴"
-          >
-            <Clock size={20} />
-            <span className="hidden sm:inline">履歴</span>
-          </button>
+          {isAdmin && (
+            <>
+              <button
+                onClick={() => setIsHistoryModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                title="変更履歴"
+              >
+                <Clock size={20} />
+                <span className="hidden sm:inline">履歴</span>
+              </button>
 
-          <button
-            onClick={handleExportCSV}
-            disabled={isExporting}
-            className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-          >
-            <Download size={20} />
-            <span className="hidden sm:inline">CSV出力</span>
-          </button>
+              <button
+                onClick={handleExportCSV}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                <Download size={20} />
+                <span className="hidden sm:inline">CSV出力</span>
+              </button>
 
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-1 md:flex-initial justify-center"
-          >
-            <Plus size={20} />
-            商品を追加
-          </button>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-1 md:flex-initial justify-center"
+              >
+                <Plus size={20} />
+                商品を追加
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -161,7 +169,7 @@ export default function DashboardContent({
       </div>
 
       {/* Product List */}
-      <ProductList searchQuery={searchValue} locationFilter={activeLocation} refreshTrigger={refreshTrigger} />
+      <ProductList searchQuery={searchValue} locationFilter={activeLocation} refreshTrigger={refreshTrigger} userRole={userRole} />
 
       {/* Create Product Modal */}
       <CreateProductModal

@@ -5,6 +5,7 @@ import { getProducts } from '@/lib/actions';
 import ProductRow from './ProductRow';
 import { Package } from 'lucide-react';
 import { Product, ProductVariant } from '@prisma/client';
+import { UserRole } from '@/lib/auth';
 
 type ProductWithVariants = Product & {
   variants: ProductVariant[];
@@ -13,11 +14,13 @@ type ProductWithVariants = Product & {
 export default function ProductList({
   searchQuery,
   locationFilter,
-  refreshTrigger
+  refreshTrigger,
+  userRole = 'guest',
 }: {
   searchQuery?: string;
   locationFilter?: string;
   refreshTrigger?: number;
+  userRole?: UserRole;
 }) {
   const [products, setProducts] = useState<ProductWithVariants[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,6 +86,7 @@ export default function ProductList({
           product={product}
           locationFilter={locationFilter}
           onProductDeleted={handleProductDeleted}
+          userRole={userRole}
         />
       ))}
     </div>

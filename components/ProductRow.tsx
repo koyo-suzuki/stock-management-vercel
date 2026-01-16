@@ -8,6 +8,7 @@ import { deleteProduct } from '@/lib/actions';
 import toast from 'react-hot-toast';
 import VariantRow from './VariantRow';
 import EditProductModal from './EditProductModal';
+import { UserRole } from '@/lib/auth';
 
 type ProductWithVariants = Product & {
   variants: ProductVariant[];
@@ -16,12 +17,15 @@ type ProductWithVariants = Product & {
 export default function ProductRow({
   product,
   locationFilter,
-  onProductDeleted
+  onProductDeleted,
+  userRole = 'guest',
 }: {
   product: ProductWithVariants;
   locationFilter?: string;
   onProductDeleted?: () => void;
+  userRole?: UserRole;
 }) {
+  const isAdmin = userRole === 'admin';
   const [isExpanded, setIsExpanded] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -77,21 +81,25 @@ export default function ProductRow({
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsEditModalOpen(true)}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-            title="商品を編集"
-          >
-            <Edit size={20} />
-          </button>
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-            title="商品を削除"
-          >
-            <Trash2 size={20} />
-          </button>
+          {isAdmin && (
+            <>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                title="商品を編集"
+              >
+                <Edit size={20} />
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                title="商品を削除"
+              >
+                <Trash2 size={20} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -122,6 +130,7 @@ export default function ProductRow({
                   key={variant.id}
                   variant={variant}
                   locationFilter={locationFilter}
+                  userRole={userRole}
                 />
               ))}
             </tbody>

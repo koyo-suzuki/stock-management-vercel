@@ -8,8 +8,10 @@ export function middleware(req: NextRequest) {
   const basicAuth = req.headers.get('authorization');
 
   // Get credentials from environment variables
-  const validUsername = process.env.BASIC_AUTH_USER || 'admin';
-  const validPassword = process.env.BASIC_AUTH_PASSWORD || 'password';
+  const adminUsername = process.env.BASIC_AUTH_USER || 'admin';
+  const adminPassword = process.env.BASIC_AUTH_PASSWORD || 'password';
+  const guestUsername = process.env.GUEST_AUTH_USER || 'guest';
+  const guestPassword = process.env.GUEST_AUTH_PASSWORD || 'guest123';
 
   if (basicAuth) {
     try {
@@ -17,8 +19,18 @@ export function middleware(req: NextRequest) {
       if (authValue) {
         const [user, pwd] = atob(authValue).split(':');
 
-        if (user === validUsername && pwd === validPassword) {
-          return NextResponse.next();
+        // Check admin credentials
+        if (user === adminUsername && pwd === adminPassword) {
+          const response = NextResponse.next();
+          response.headers.set('x-user-role', 'admin');
+          return response;
+        }
+
+        // Check guest credentials
+        if (user === guestUsername && pwd === guestPassword) {
+          const response = NextResponse.next();
+          response.headers.set('x-user-role', 'guest');
+          return response;
         }
       }
     } catch (error) {
