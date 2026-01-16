@@ -14,10 +14,12 @@ type ProductWithVariants = Product & {
 
 export default function ProductRow({
   product,
-  locationFilter
+  locationFilter,
+  onProductDeleted
 }: {
   product: ProductWithVariants;
   locationFilter?: string;
+  onProductDeleted?: () => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -32,6 +34,9 @@ export default function ProductRow({
 
     if (result.success) {
       toast.success('商品を削除しました');
+      if (onProductDeleted) {
+        onProductDeleted();
+      }
     } else {
       toast.error('商品の削除に失敗しました');
       setIsDeleting(false);
@@ -86,26 +91,20 @@ export default function ProductRow({
             <thead className="bg-gray-100 border-b">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Color
+                  カラー
                 </th>
                 {(locationFilter === 'all' || locationFilter === 'tokyo' || !locationFilter) && (
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Tokyo Stock
+                    東京在庫
                   </th>
                 )}
                 {(locationFilter === 'all' || locationFilter === 'osaka' || !locationFilter) && (
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Osaka Stock
+                    大阪在庫
                   </th>
                 )}
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Total
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Min Stock
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Status
+                  合計
                 </th>
               </tr>
             </thead>

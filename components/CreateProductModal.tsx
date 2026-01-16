@@ -15,9 +15,11 @@ type Variant = {
 export default function CreateProductModal({
   isOpen,
   onClose,
+  onProductCreated,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  onProductCreated?: () => void;
 }) {
   const [productName, setProductName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -74,6 +76,9 @@ export default function CreateProductModal({
       setImageUrl('');
       setVariants([{ color: '', stockTokyo: 0, stockOsaka: 0, minStock: 0 }]);
       onClose();
+      if (onProductCreated) {
+        onProductCreated();
+      }
     } else {
       toast.error(result.error || '商品の作成に失敗しました');
     }

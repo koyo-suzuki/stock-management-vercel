@@ -12,23 +12,30 @@ type ProductWithVariants = Product & {
 
 export default function ProductList({
   searchQuery,
-  locationFilter
+  locationFilter,
+  refreshTrigger
 }: {
   searchQuery?: string;
   locationFilter?: string;
+  refreshTrigger?: number;
 }) {
   const [products, setProducts] = useState<ProductWithVariants[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const loadProducts = async () => {
+    setIsLoading(true);
+    const data = await getProducts();
+    setProducts(data as ProductWithVariants[]);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    const loadProducts = async () => {
-      setIsLoading(true);
-      const data = await getProducts();
-      setProducts(data as ProductWithVariants[]);
-      setIsLoading(false);
-    };
     loadProducts();
-  }, []);
+  }, [refreshTrigger]);
+
+  const handleProductDeleted = () => {
+    loadProducts();
+  };
 
   if (isLoading) {
     return (
@@ -71,7 +78,12 @@ export default function ProductList({
   return (
     <div className="space-y-4">
       {filteredProducts.map((product) => (
-        <ProductRow key={product.id} product={product} locationFilter={locationFilter} />
+        <ProductRow
+          key={product.id}
+          product={product}
+          locationFilter={locationFilter}
+          onProductDeleted={handleProductDeleted}
+        />
       ))}
     </div>
   );

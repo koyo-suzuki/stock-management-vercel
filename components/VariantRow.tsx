@@ -4,7 +4,6 @@ import { ProductVariant } from '@prisma/client';
 import { useState } from 'react';
 import { updateStock } from '@/lib/actions';
 import toast from 'react-hot-toast';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
 
 export default function VariantRow({
   variant,
@@ -19,7 +18,6 @@ export default function VariantRow({
   const [isSaving, setIsSaving] = useState(false);
 
   const totalStock = tokyoStock + osakaStock;
-  const isLowStock = totalStock < variant.minStock;
 
   const handleStockUpdate = async (field: 'stockTokyo' | 'stockOsaka', value: number) => {
     if (value < 0) return;
@@ -53,7 +51,7 @@ export default function VariantRow({
   };
 
   return (
-    <tr className={`${isLowStock ? 'bg-red-50' : 'hover:bg-gray-50'} transition-colors`}>
+    <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           <div
@@ -95,24 +93,6 @@ export default function VariantRow({
 
       <td className="px-4 py-3">
         <span className="font-semibold text-gray-900">{totalStock}</span>
-      </td>
-
-      <td className="px-4 py-3">
-        <span className="text-gray-600">{variant.minStock}</span>
-      </td>
-
-      <td className="px-4 py-3">
-        {isLowStock ? (
-          <div className="flex items-center gap-2 text-red-600">
-            <AlertTriangle size={18} />
-            <span className="text-sm font-semibold">在庫少</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-green-600">
-            <CheckCircle size={18} />
-            <span className="text-sm">良好</span>
-          </div>
-        )}
       </td>
     </tr>
   );

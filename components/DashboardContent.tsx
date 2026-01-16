@@ -21,6 +21,7 @@ export default function DashboardContent({
   const [searchValue, setSearchValue] = useState(searchQuery || '');
   const [activeLocation, setActiveLocation] = useState(locationFilter || 'all');
   const [isExporting, setIsExporting] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -140,10 +141,14 @@ export default function DashboardContent({
       </div>
 
       {/* Product List */}
-      <ProductList searchQuery={searchValue} locationFilter={activeLocation} />
+      <ProductList searchQuery={searchValue} locationFilter={activeLocation} refreshTrigger={refreshTrigger} />
 
       {/* Create Product Modal */}
-      <CreateProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreateProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onProductCreated={() => setRefreshTrigger(prev => prev + 1)}
+      />
     </div>
   );
 }
