@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Plus, Search, Download, MapPin, RefreshCw } from 'lucide-react';
+import { Plus, Search, Download, MapPin, RefreshCw, Clock } from 'lucide-react';
 import CreateProductModal from './CreateProductModal';
+import StockHistoryModal from './StockHistoryModal';
 import ProductList from './ProductList';
 import { exportToCSV } from '@/lib/actions';
 import toast from 'react-hot-toast';
@@ -18,6 +19,7 @@ export default function DashboardContent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(searchQuery || '');
   const [activeLocation, setActiveLocation] = useState(locationFilter || 'all');
   const [isExporting, setIsExporting] = useState(false);
@@ -95,6 +97,15 @@ export default function DashboardContent({
           </button>
 
           <button
+            onClick={() => setIsHistoryModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            title="変更履歴"
+          >
+            <Clock size={20} />
+            <span className="hidden sm:inline">履歴</span>
+          </button>
+
+          <button
             onClick={handleExportCSV}
             disabled={isExporting}
             className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
@@ -157,6 +168,12 @@ export default function DashboardContent({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onProductCreated={() => setRefreshTrigger(prev => prev + 1)}
+      />
+
+      {/* Stock History Modal */}
+      <StockHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
       />
     </div>
   );

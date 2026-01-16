@@ -114,10 +114,32 @@ export async function updateStock(data: z.infer<typeof UpdateStockSchema>) {
   try {
     const validated = UpdateStockSchema.parse(data);
 
+    // 現在の値を取得
+    const currentVariant = await prisma.productVariant.findUnique({
+      where: { id: validated.variantId },
+    });
+
+    if (!currentVariant) {
+      return { success: false, error: 'Variant not found' };
+    }
+
+    const oldValue = currentVariant[validated.field] as number;
+
+    // 在庫を更新
     const variant = await prisma.productVariant.update({
       where: { id: validated.variantId },
       data: {
         [validated.field]: validated.value,
+      },
+    });
+
+    // 履歴を記録
+    await prisma.stockHistory.create({
+      data: {
+        variantId: validated.variantId,
+        field: validated.field,
+        oldValue: oldValue,
+        newValue: validated.value,
       },
     });
 
@@ -181,6 +203,30 @@ export async function getProducts() {
     return products;
   } catch (error) {
     console.error('Error fetching products:', error);
+    return [];
+  }
+}
+
+// Get stock history
+export async function getStockHistory(limit: number = 50) {
+  try {
+    const history = await prisma.stockHistory.findMany({
+      include: {
+        variant: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+    });
+
+    return history;
+  } catch (error) {
+    console.error('Error fetching stock history:', error);
     return [];
   }
 }

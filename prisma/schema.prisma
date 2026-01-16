@@ -37,6 +37,21 @@ model ProductVariant {
   stockTokyo  Int     @default(0)
   stockOsaka  Int     @default(0)
   minStock    Int     @default(0) // この値を下回るとアラート表示
+  stockHistory StockHistory[]
 
   @@unique([productId, color]) // 同一商品内で同じ色は重複不可
+}
+
+// 在庫変更履歴
+model StockHistory {
+  id          String   @id @default(cuid())
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  field       String   // 'stockTokyo' or 'stockOsaka'
+  oldValue    Int      // 変更前の値
+  newValue    Int      // 変更後の値
+  createdAt   DateTime @default(now())
+
+  @@index([variantId])
+  @@index([createdAt])
 }
