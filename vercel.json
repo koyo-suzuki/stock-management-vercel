@@ -1,9 +1,5 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "env": {
-    "BASIC_AUTH_USER": "@basic_auth_user",
-    "BASIC_AUTH_PASSWORD": "@basic_auth_password"
-  }
+  "framework": "nextjs"
 }

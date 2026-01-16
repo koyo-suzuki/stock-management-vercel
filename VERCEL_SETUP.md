@@ -8,7 +8,9 @@
 
 ## 2. 環境変数の設定
 
-Vercelのプロジェト設定で以下の環境変数を追加してください：
+Vercelのプロジェクト設定で以下の環境変数を追加してください：
+
+**Settings** → **Environment Variables** で以下を設定：
 
 ### データベース接続
 ```
@@ -16,13 +18,16 @@ POSTGRES_PRISMA_URL=your-vercel-postgres-prisma-url
 POSTGRES_URL_NON_POOLING=your-vercel-postgres-url-non-pooling
 ```
 
-### Basic認証
+### Basic認証（必須）
 ```
 BASIC_AUTH_USER=admin
 BASIC_AUTH_PASSWORD=your-secure-password
 ```
 
-**重要**: `BASIC_AUTH_PASSWORD`は必ず強力なパスワードに変更してください。
+**重要事項:**
+- `BASIC_AUTH_PASSWORD`は必ず強力なパスワードに変更してください
+- 環境変数を追加後、**Redeploy**が必要です
+- Production、Preview、Developmentの全環境に設定してください
 
 ## 3. ビルド設定
 
