@@ -114,7 +114,7 @@ export default function DashboardContent({
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          全ロケーション
+          全体
         </button>
         <button
           onClick={() => handleLocationChange('tokyo')}

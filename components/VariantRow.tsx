@@ -17,8 +17,6 @@ export default function VariantRow({
   const [osakaStock, setOsakaStock] = useState(variant.stockOsaka);
   const [isSaving, setIsSaving] = useState(false);
 
-  const totalStock = tokyoStock + osakaStock;
-
   const handleStockUpdate = async (field: 'stockTokyo' | 'stockOsaka', value: number) => {
     if (value < 0) return;
 
@@ -65,35 +63,45 @@ export default function VariantRow({
 
       {(locationFilter === 'all' || locationFilter === 'tokyo' || !locationFilter) && (
         <td className="px-4 py-3">
-          <input
-            type="number"
-            min="0"
+          <select
             value={tokyoStock}
-            onChange={(e) => setTokyoStock(parseInt(e.target.value) || 0)}
-            onBlur={(e) => handleStockUpdate('stockTokyo', parseInt(e.target.value) || 0)}
-            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
+            onChange={(e) => {
+              const newValue = parseInt(e.target.value);
+              setTokyoStock(newValue);
+              handleStockUpdate('stockTokyo', newValue);
+            }}
+            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer"
             disabled={isSaving}
-          />
+          >
+            {Array.from({ length: 101 }, (_, i) => i).map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
         </td>
       )}
 
       {(locationFilter === 'all' || locationFilter === 'osaka' || !locationFilter) && (
         <td className="px-4 py-3">
-          <input
-            type="number"
-            min="0"
+          <select
             value={osakaStock}
-            onChange={(e) => setOsakaStock(parseInt(e.target.value) || 0)}
-            onBlur={(e) => handleStockUpdate('stockOsaka', parseInt(e.target.value) || 0)}
-            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
+            onChange={(e) => {
+              const newValue = parseInt(e.target.value);
+              setOsakaStock(newValue);
+              handleStockUpdate('stockOsaka', newValue);
+            }}
+            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer"
             disabled={isSaving}
-          />
+          >
+            {Array.from({ length: 101 }, (_, i) => i).map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
         </td>
       )}
-
-      <td className="px-4 py-3">
-        <span className="font-semibold text-gray-900">{totalStock}</span>
-      </td>
     </tr>
   );
 }
