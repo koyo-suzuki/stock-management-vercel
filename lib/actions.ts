@@ -1,14 +1,8 @@
 'use server';
 
-import { signOut } from '@/auth';
 import { revalidatePath } from 'next/cache';
 import { prisma } from './prisma';
 import { z } from 'zod';
-
-// Authentication Actions
-export async function handleSignOut() {
-  await signOut();
-}
 
 // Product Actions
 const ProductSchema = z.object({

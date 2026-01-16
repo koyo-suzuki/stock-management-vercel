@@ -10,7 +10,7 @@ A modern, real-time inventory management system for managing stock across multip
 - **Low Stock Alerts**: Visual alerts when stock falls below minimum threshold
 - **Search & Filter**: Search products and filter by location
 - **CSV Export**: Export inventory data to CSV format
-- **Secure Authentication**: Password-protected access with NextAuth.js
+- **Secure Authentication**: HTTP Basic Authentication
 
 ## Tech Stack
 
@@ -19,7 +19,7 @@ A modern, real-time inventory management system for managing stock across multip
 - **Styling**: Tailwind CSS
 - **Database**: Vercel Postgres (PostgreSQL)
 - **ORM**: Prisma
-- **Auth**: NextAuth.js v5
+- **Auth**: HTTP Basic Authentication
 - **Icons**: Lucide React
 - **Validation**: Zod
 - **UI Feedback**: React Hot Toast
@@ -47,13 +47,8 @@ npm install
 POSTGRES_PRISMA_URL="your-vercel-postgres-url"
 POSTGRES_URL_NON_POOLING="your-vercel-postgres-url-non-pooling"
 
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-key-generate-with-openssl-rand-base64-32"
-```
-
-To generate `NEXTAUTH_SECRET`:
-```bash
-openssl rand -base64 32
+BASIC_AUTH_USER="admin"
+BASIC_AUTH_PASSWORD="your-secure-password"
 ```
 
 ### 3. Setup Prisma
