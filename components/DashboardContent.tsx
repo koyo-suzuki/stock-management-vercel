@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Plus, Search, Download, MapPin } from 'lucide-react';
+import { Plus, Search, Download, MapPin, RefreshCw } from 'lucide-react';
 import CreateProductModal from './CreateProductModal';
 import ProductList from './ProductList';
 import { exportToCSV } from '@/lib/actions';
@@ -85,6 +85,15 @@ export default function DashboardContent({
         </div>
 
         <div className="flex gap-3 w-full md:w-auto">
+          <button
+            onClick={() => setRefreshTrigger(prev => prev + 1)}
+            className="flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            title="リストを更新"
+          >
+            <RefreshCw size={20} />
+            <span className="hidden sm:inline">更新</span>
+          </button>
+
           <button
             onClick={handleExportCSV}
             disabled={isExporting}

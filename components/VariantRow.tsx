@@ -4,6 +4,7 @@ import { ProductVariant } from '@prisma/client';
 import { useState } from 'react';
 import { updateStock } from '@/lib/actions';
 import toast from 'react-hot-toast';
+import { Check, X } from 'lucide-react';
 
 export default function VariantRow({
   variant,
@@ -17,15 +18,13 @@ export default function VariantRow({
   const [osakaStock, setOsakaStock] = useState(variant.stockOsaka);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleStockUpdate = async (field: 'stockTokyo' | 'stockOsaka', value: number) => {
-    if (value < 0) return;
+  // Pending changes
+  const [pendingTokyoStock, setPendingTokyoStock] = useState<number | null>(null);
+  const [pendingOsakaStock, setPendingOsakaStock] = useState<number | null>(null);
 
-    // Optimistic update
-    if (field === 'stockTokyo') {
-      setTokyoStock(value);
-    } else {
-      setOsakaStock(value);
-    }
+  const handleConfirm = async (field: 'stockTokyo' | 'stockOsaka') => {
+    const value = field === 'stockTokyo' ? pendingTokyoStock : pendingOsakaStock;
+    if (value === null) return;
 
     setIsSaving(true);
 
@@ -37,14 +36,25 @@ export default function VariantRow({
 
     setIsSaving(false);
 
-    if (!result.success) {
-      // Revert on error
+    if (result.success) {
       if (field === 'stockTokyo') {
-        setTokyoStock(variant.stockTokyo);
+        setTokyoStock(value);
+        setPendingTokyoStock(null);
       } else {
-        setOsakaStock(variant.stockOsaka);
+        setOsakaStock(value);
+        setPendingOsakaStock(null);
       }
+      toast.success('在庫を更新しました');
+    } else {
       toast.error('在庫の更新に失敗しました');
+    }
+  };
+
+  const handleCancel = (field: 'stockTokyo' | 'stockOsaka') => {
+    if (field === 'stockTokyo') {
+      setPendingTokyoStock(null);
+    } else {
+      setPendingOsakaStock(null);
     }
   };
 
@@ -63,43 +73,79 @@ export default function VariantRow({
 
       {(locationFilter === 'all' || locationFilter === 'tokyo' || !locationFilter) && (
         <td className="px-4 py-3">
-          <select
-            value={tokyoStock}
-            onChange={(e) => {
-              const newValue = parseInt(e.target.value);
-              setTokyoStock(newValue);
-              handleStockUpdate('stockTokyo', newValue);
-            }}
-            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer"
-            disabled={isSaving}
-          >
-            {Array.from({ length: 101 }, (_, i) => i).map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              value={pendingTokyoStock !== null ? pendingTokyoStock : tokyoStock}
+              onChange={(e) => setPendingTokyoStock(parseInt(e.target.value))}
+              className="w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer text-sm"
+              disabled={isSaving}
+            >
+              {Array.from({ length: 101 }, (_, i) => i).map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+            {pendingTokyoStock !== null && (
+              <div className="flex gap-1">
+                <button
+                  onClick={() => handleConfirm('stockTokyo')}
+                  disabled={isSaving}
+                  className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors disabled:opacity-50"
+                  title="確定"
+                >
+                  <Check size={16} />
+                </button>
+                <button
+                  onClick={() => handleCancel('stockTokyo')}
+                  disabled={isSaving}
+                  className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                  title="キャンセル"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+          </div>
         </td>
       )}
 
       {(locationFilter === 'all' || locationFilter === 'osaka' || !locationFilter) && (
         <td className="px-4 py-3">
-          <select
-            value={osakaStock}
-            onChange={(e) => {
-              const newValue = parseInt(e.target.value);
-              setOsakaStock(newValue);
-              handleStockUpdate('stockOsaka', newValue);
-            }}
-            className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer"
-            disabled={isSaving}
-          >
-            {Array.from({ length: 101 }, (_, i) => i).map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              value={pendingOsakaStock !== null ? pendingOsakaStock : osakaStock}
+              onChange={(e) => setPendingOsakaStock(parseInt(e.target.value))}
+              className="w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white cursor-pointer text-sm"
+              disabled={isSaving}
+            >
+              {Array.from({ length: 101 }, (_, i) => i).map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+            {pendingOsakaStock !== null && (
+              <div className="flex gap-1">
+                <button
+                  onClick={() => handleConfirm('stockOsaka')}
+                  disabled={isSaving}
+                  className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors disabled:opacity-50"
+                  title="確定"
+                >
+                  <Check size={16} />
+                </button>
+                <button
+                  onClick={() => handleCancel('stockOsaka')}
+                  disabled={isSaving}
+                  className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                  title="キャンセル"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+          </div>
         </td>
       )}
     </tr>
