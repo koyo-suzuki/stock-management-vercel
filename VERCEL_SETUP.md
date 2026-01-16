@@ -12,13 +12,16 @@ Vercelのプロジェクト設定で以下の環境変数を追加してくだ�
 
 **Settings** → **Environment Variables** で以下を設定：
 
-### データベース接続
+### データベース接続（Vercel Postgresを使用している場合は自動設定されます）
 ```
-POSTGRES_PRISMA_URL=your-vercel-postgres-prisma-url
-POSTGRES_URL_NON_POOLING=your-vercel-postgres-url-non-pooling
+PRISMA_DATABASE_URL=your-prisma-database-url
+DATABASE_URL=your-database-url
 ```
 
+**注意**: Vercel Postgresを既に接続している場合、`DATABASE_URL`、`POSTGRES_URL`、`PRISMA_DATABASE_URL`は自動的に設定されています。追加設定は不要です。
+
 ### Basic認証（必須）
+以下の2つの環境変数を追加してください：
 ```
 BASIC_AUTH_USER=admin
 BASIC_AUTH_PASSWORD=your-secure-password
