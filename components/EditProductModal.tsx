@@ -2,30 +2,44 @@
 
 import { useState } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { createProduct } from '@/lib/actions';
+import { updateProduct } from '@/lib/actions';
 import toast from 'react-hot-toast';
+import { Product, ProductVariant } from '@prisma/client';
+
+type ProductWithVariants = Product & {
+  variants: ProductVariant[];
+};
 
 type Variant = {
+  id?: string;
   color: string;
   stockTokyo: number;
   stockOsaka: number;
   minStock: number;
 };
 
-export default function CreateProductModal({
+export default function EditProductModal({
   isOpen,
   onClose,
-  onProductCreated,
+  product,
+  onProductUpdated,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onProductCreated?: () => void;
+  product: ProductWithVariants;
+  onProductUpdated?: () => void;
 }) {
-  const [productName, setProductName] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [variants, setVariants] = useState<Variant[]>([
-    { color: '', stockTokyo: 0, stockOsaka: 0, minStock: 0 },
-  ]);
+  const [productName, setProductName] = useState(product.name);
+  const [imageUrl, setImageUrl] = useState(product.imageUrl || '');
+  const [variants, setVariants] = useState<Variant[]>(
+    product.variants.map(v => ({
+      id: v.id,
+      color: v.color,
+      stockTokyo: v.stockTokyo,
+      stockOsaka: v.stockOsaka,
+      minStock: v.minStock,
+    }))
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -54,37 +68,32 @@ export default function CreateProductModal({
       return;
     }
 
-    // バリエーションが入力されている場合のみチェック
     const filledVariants = variants.filter(v => v.color.trim());
 
-    // 入力済みバリエーションに空のカラーがないかチェック
-    if (variants.some(v => v.color.trim() && !v.color.trim())) {
-      toast.error('すべてのバリエーションにカラーを入力してください');
+    if (filledVariants.length === 0) {
+      toast.error('少なくとも1つのバリエーションが必要です');
       return;
     }
 
     setIsSubmitting(true);
 
-    const result = await createProduct({
+    const result = await updateProduct({
+      productId: product.id,
       name: productName,
       imageUrl: imageUrl || undefined,
-      variants: filledVariants.length > 0 ? filledVariants : [{ color: 'デフォルト', stockTokyo: 0, stockOsaka: 0, minStock: 0 }],
+      variants: filledVariants,
     });
 
     setIsSubmitting(false);
 
     if (result.success) {
-      toast.success('商品を作成しました');
-      // Reset form
-      setProductName('');
-      setImageUrl('');
-      setVariants([{ color: '', stockTokyo: 0, stockOsaka: 0, minStock: 0 }]);
+      toast.success('商品を更新しました');
       onClose();
-      if (onProductCreated) {
-        onProductCreated();
+      if (onProductUpdated) {
+        onProductUpdated();
       }
     } else {
-      toast.error(result.error || '商品の作成に失敗しました');
+      toast.error(result.error || '商品の更新に失敗しました');
     }
   };
 
@@ -93,7 +102,7 @@ export default function CreateProductModal({
       <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b flex items-center justify-between bg-gray-50">
-          <h2 className="text-2xl font-bold text-gray-900">新規商品作成</h2>
+          <h2 className="text-2xl font-bold text-gray-900">商品を編集</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-200 rounded-full transition-colors"
@@ -111,27 +120,27 @@ export default function CreateProductModal({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  商品名 *
+                  商品名 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
-                  placeholder="例: コットンTシャツ"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
+                  placeholder="例: Tシャツ"
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  画像URL（任意）
+                  画像URL
                 </label>
                 <input
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
@@ -144,29 +153,28 @@ export default function CreateProductModal({
                 <button
                   type="button"
                   onClick={addVariant}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                 >
-                  <Plus size={18} />
+                  <Plus size={16} />
                   バリエーション追加
                 </button>
               </div>
 
               <div className="space-y-3">
                 {variants.map((variant, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-5 gap-3">
-                        <div className="md:col-span-1">
+                  <div key={index} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            カラー *
+                            カラー <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="text"
                             value={variant.color}
                             onChange={(e) => updateVariant(index, 'color', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
-                            placeholder="赤"
-                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm text-gray-900 bg-white"
+                            placeholder="例: 赤"
                           />
                         </div>
 
@@ -179,7 +187,7 @@ export default function CreateProductModal({
                             min="0"
                             value={variant.stockTokyo}
                             onChange={(e) => updateVariant(index, 'stockTokyo', parseInt(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm text-gray-900 bg-white"
                           />
                         </div>
 
@@ -192,7 +200,7 @@ export default function CreateProductModal({
                             min="0"
                             value={variant.stockOsaka}
                             onChange={(e) => updateVariant(index, 'stockOsaka', parseInt(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm text-gray-900 bg-white"
                           />
                         </div>
 
@@ -205,7 +213,7 @@ export default function CreateProductModal({
                             min="0"
                             value={variant.minStock}
                             onChange={(e) => updateVariant(index, 'minStock', parseInt(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm text-gray-900 bg-white"
                           />
                         </div>
                       </div>
@@ -214,7 +222,7 @@ export default function CreateProductModal({
                         <button
                           type="button"
                           onClick={() => removeVariant(index)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors mt-6"
+                          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors mt-5"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -228,20 +236,20 @@ export default function CreateProductModal({
         </form>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-3">
+        <div className="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
           >
             キャンセル
           </button>
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? '作成中...' : '商品を作成'}
+            {isSubmitting ? '更新中...' : '商品を更新'}
           </button>
         </div>
       </div>

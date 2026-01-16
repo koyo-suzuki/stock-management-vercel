@@ -2,11 +2,12 @@
 
 import { Product, ProductVariant } from '@prisma/client';
 import Image from 'next/image';
-import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, ChevronDown, ChevronUp, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { deleteProduct } from '@/lib/actions';
 import toast from 'react-hot-toast';
 import VariantRow from './VariantRow';
+import EditProductModal from './EditProductModal';
 
 type ProductWithVariants = Product & {
   variants: ProductVariant[];
@@ -23,6 +24,7 @@ export default function ProductRow({
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleDelete = async () => {
     if (!confirm(`「${product.name}」とすべてのバリエーションを削除してもよろしいですか？`)) {
@@ -74,14 +76,23 @@ export default function ProductRow({
           </div>
         </div>
 
-        <button
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-          title="Delete product"
-        >
-          <Trash2 size={20} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsEditModalOpen(true)}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            title="商品を編集"
+          >
+            <Edit size={20} />
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+            title="商品を削除"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Variants Table */}
@@ -119,6 +130,16 @@ export default function ProductRow({
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* Edit Product Modal */}
+      {isEditModalOpen && (
+        <EditProductModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          product={product}
+          onProductUpdated={onProductDeleted}
+        />
       )}
     </div>
   );

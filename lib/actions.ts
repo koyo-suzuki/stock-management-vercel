@@ -43,6 +43,52 @@ export async function createProduct(data: z.infer<typeof ProductSchema>) {
   }
 }
 
+export async function updateProduct(data: {
+  productId: string;
+  name: string;
+  imageUrl?: string;
+  variants: Array<{
+    id?: string;
+    color: string;
+    stockTokyo: number;
+    stockOsaka: number;
+    minStock: number;
+  }>;
+}) {
+  try {
+    // 既存のバリエーションを削除
+    await prisma.productVariant.deleteMany({
+      where: { productId: data.productId },
+    });
+
+    // 商品を更新し、新しいバリエーションを作成
+    const product = await prisma.product.update({
+      where: { id: data.productId },
+      data: {
+        name: data.name,
+        imageUrl: data.imageUrl || null,
+        variants: {
+          create: data.variants.map(v => ({
+            color: v.color,
+            stockTokyo: v.stockTokyo,
+            stockOsaka: v.stockOsaka,
+            minStock: v.minStock,
+          })),
+        },
+      },
+      include: {
+        variants: true,
+      },
+    });
+
+    revalidatePath('/dashboard');
+    return { success: true, product };
+  } catch (error) {
+    console.error('Error updating product:', error);
+    return { success: false, error: 'Failed to update product' };
+  }
+}
+
 export async function deleteProduct(productId: string) {
   try {
     await prisma.product.delete({
