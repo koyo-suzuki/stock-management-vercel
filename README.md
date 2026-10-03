@@ -1,4 +1,4 @@
-# StockYard Manager v3.2
+# StockYard Manager v3.3
 
 在庫管理システム - 複数拠点（東京・大阪）の在庫をリアルタイムで管理するモダンなWebアプリケーション
 
@@ -389,7 +389,7 @@ MIT
 
 ## バージョン履歴 / Version History
 
-### v3.3（未リリース / Unreleased）
+### v3.3 (2026-10)
 
 - Basic認証のロール判定を修正
 - Server Actionsでサーバー側の権限チェックを追加
