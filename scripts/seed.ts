@@ -4,26 +4,11 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Starting database seed...');
-
-  // Create default user
-  const hashedPassword = await bcrypt.hash('password123', 10);
-
-  const user = await prisma.user.upsert({
-    where: { username: 'admin' },
-    update: {},
-    create: {
-      username: 'admin',
-      password: hashedPassword,
-    },
-  });
-
-  console.log('✓ Created user:', user.username);
 
   // Create sample products
   const products = [
@@ -83,9 +68,6 @@ async function main() {
   }
 
   console.log('\n✅ Database seed completed successfully!');
-  console.log('\nDefault credentials:');
-  console.log('  Username: admin');
-  console.log('  Password: password123');
 }
 
 main()

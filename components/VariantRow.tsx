@@ -1,7 +1,7 @@
 'use client';
 
 import { ProductVariant } from '@prisma/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { updateStock } from '@/lib/actions';
 import toast from 'react-hot-toast';
 import { Check, X } from 'lucide-react';
@@ -26,6 +26,14 @@ export default function VariantRow({
   const [pendingTokyoStock, setPendingTokyoStock] = useState<number | null>(null);
   const [pendingOsakaStock, setPendingOsakaStock] = useState<number | null>(null);
 
+  useEffect(() => {
+    setTokyoStock(variant.stockTokyo);
+  }, [variant.stockTokyo]);
+
+  useEffect(() => {
+    setOsakaStock(variant.stockOsaka);
+  }, [variant.stockOsaka]);
+
   const handleConfirm = async (field: 'stockTokyo' | 'stockOsaka') => {
     const value = field === 'stockTokyo' ? pendingTokyoStock : pendingOsakaStock;
     if (value === null) return;
@@ -36,6 +44,7 @@ export default function VariantRow({
       variantId: variant.id,
       field,
       value,
+      expectedValue: field === 'stockTokyo' ? tokyoStock : osakaStock,
     });
 
     setIsSaving(false);
@@ -49,6 +58,15 @@ export default function VariantRow({
         setPendingOsakaStock(null);
       }
       toast.success('在庫を更新しました');
+    } else if ('conflict' in result && result.conflict) {
+      if (field === 'stockTokyo') {
+        setTokyoStock(result.currentValue);
+        setPendingTokyoStock(null);
+      } else {
+        setOsakaStock(result.currentValue);
+        setPendingOsakaStock(null);
+      }
+      toast.error(`他のユーザーが先に更新しました（最新: ${result.currentValue}）`);
     } else {
       toast.error('在庫の更新に失敗しました');
     }
@@ -84,7 +102,7 @@ export default function VariantRow({
               className={`w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white text-sm ${isAdmin ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
               disabled={isSaving || !isAdmin}
             >
-              {Array.from({ length: 101 }, (_, i) => i).map((num) => (
+              {Array.from({ length: Math.max(100, tokyoStock, pendingTokyoStock ?? 0) + 1 }, (_, i) => i).map((num) => (
                 <option key={num} value={num}>
                   {num}
                 </option>
@@ -129,7 +147,7 @@ export default function VariantRow({
               className={`w-20 px-2 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white text-sm ${isAdmin ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
               disabled={isSaving || !isAdmin}
             >
-              {Array.from({ length: 101 }, (_, i) => i).map((num) => (
+              {Array.from({ length: Math.max(100, osakaStock, pendingOsakaStock ?? 0) + 1 }, (_, i) => i).map((num) => (
                 <option key={num} value={num}>
                   {num}
                 </option>

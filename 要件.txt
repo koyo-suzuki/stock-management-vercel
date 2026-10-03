@@ -1,3 +1,4 @@
+※初期要件。認証は NextAuth ではなく Basic 認証で実装済み。最新仕様は README.md を参照
 # StockYard Manager (v3.1) - Technical Requirement Document
 
 ## 1. プロジェクト概要

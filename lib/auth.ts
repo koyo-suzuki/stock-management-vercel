@@ -1,11 +1,12 @@
 import { headers } from 'next/headers';
+import { resolveRoleFromAuthHeader } from './basic-auth';
+import type { UserRole } from './basic-auth';
 
-export type UserRole = 'admin' | 'guest';
+export type { UserRole } from './basic-auth';
 
 export async function getUserRole(): Promise<UserRole> {
   const headersList = await headers();
-  const role = headersList.get('x-user-role');
-  return (role as UserRole) || 'guest';
+  return resolveRoleFromAuthHeader(headersList.get('authorization')) || 'guest';
 }
 
 export async function isAdmin(): Promise<boolean> {
